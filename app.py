@@ -1,7 +1,8 @@
 from blockchain import Blockchain
+import json
 
 from uuid import uuid4
-from flask import Flask, jsonify, request
+from flask import Flask, request, Response
 
 # Instantiate our Node
 app = Flask(__name__)
@@ -39,7 +40,7 @@ def mine():
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
     }
-    return jsonify(response), 200
+    return Response(json.dumps(response), content_type='application/json; charset=utf-8'), 200
 
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
@@ -54,7 +55,7 @@ def new_transaction():
     index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
 
     response = {'message': f'Transaction will be added to Block {index}'}
-    return jsonify(response), 201
+    return Response(json.dumps(response), content_type='application/json; charset=utf-8'), 201
 
 @app.route('/chain', methods=['GET'])
 def full_chain():
@@ -62,7 +63,7 @@ def full_chain():
         'chain': blockchain.chain,
         'length': len(blockchain.chain),
     }
-    return jsonify(response), 200
+    return Response(json.dumps(response), content_type='application/json; charset=utf-8'), 200
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
@@ -82,7 +83,7 @@ def register_nodes():
         'message': 'New nodes have been added',
         'total_nodes': list(blockchain.nodes),
     }
-    return jsonify(response), 201
+    return Response(json.dumps(response), content_type='application/json; charset=utf-8'), 201
 
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
@@ -98,4 +99,4 @@ def consensus():
             'message': 'Our chain is authoritative',
             'new_chain': blockchain.chain,
         }
-    return jsonify(response), 200
+    return Response(json.dumps(response), content_type='application/json; charset=utf-8'), 200
